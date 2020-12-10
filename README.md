@@ -1,10 +1,10 @@
 # store_backend
-Backend API for store_frontend project
+Backend API for store_frontend project https://github.com/trutzzi/store_frontend
 # In index.js you need to config database and admin role. Update database manualy for admin role on user .
-# The adress and port of api need to be configured in Front End App project part located in: (src/config.json) https://github.com/trutzzi/store_frontend with address of this api.
+# The adress location and port of this api backend project  need to be configured in Front End App project part (https://github.com/trutzzi/store_frontend), file located in: (src/config.json)  with address and port of this api.
 <br/>
 
 # Initialize
 <i>npm install </i> - Install the project and modules.
-<br/><i>Config database with your mysql db in index.js </i>
+<br/><i>Config database.json and datebase from main js (index.js) with your mysql db </i>
 <br/><i>db-migrate up</i>  - Run for first use, initialize and create tables in database. </i>

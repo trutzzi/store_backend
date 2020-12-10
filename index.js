@@ -2,14 +2,14 @@ var express = require('express');
 var mysql = require('mysql');
 var cors = require('cors')
 
-//(!) Important After you defined database run db-migrate up to initialize initial tables then define adress of API IN Front End
+//(!) Important After you defined database here and in the datebase.json file  run db-migrate up to initialize initial tables then define adress of this API IN Front End section project
 
 // Database connect info
 var connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'adidas13',
-    database: 'mystore'
+    password: '',
+    database: 'big_project'
 })
 var app = express();
 const port = 3000;
@@ -23,10 +23,11 @@ const accessTokenSecret = 'wired2beinthisyear';
 const refreshTokenSecret = 'nice2have';
 let refreshTokens = [];
 
-//Miliseconds must be same in Front End
-const expireTime = '10s';
+//(!) Important Expire token time must be same as in Front End section project
+const expireTime = '5m';
 
 //Define admin schema and roles
+//(!) Important To become admin you must update manualy in datebase after migrate-up the role.
 const adminRole = {
     user: 0,
     admin: 1
