@@ -8,3 +8,6 @@ Backend API for store_frontend project https://github.com/trutzzi/store_frontend
 <i>npm install </i> - Install the project and modules.
 <br/><i>Config database.json and datebase from main js (index.js) with your mysql db </i>
 <br/><i>db-migrate up</i>  - Run for first use, initialize and create tables in database. </i>
+
+#Start
+If all of the above is ok run node . to start server.
