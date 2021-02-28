@@ -39,13 +39,25 @@ exports.up = function (db, callback) {
     date: {
       type: "timestamp", notNull: "true", defaultValue: new String('now()')
     },
+    country: {
+      type: 'string',
+    },
+    state: {
+      type: 'string',
+    },
+    address: {
+      type: 'string',
+    },
+    phone: {
+      type: 'string',
+    },
   }, function (err) {
     if (err) return callback(err);
     return callback();
   });
 };
-exports.down = function (db, callback) {
-  db.dropTable('user', callback);
+exports.down = function (db) {
+  return db.dropTable('user');
 };
 exports._meta = {
   "version": 1

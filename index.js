@@ -51,7 +51,6 @@ var upload = multer({ storage: storage })
 //auth middleware
 const authenticateJWT = (req, res, next) => {
     const authHeader = req.headers.authorization;
-
     if (authHeader) {
         const token = authHeader.split(' ')[1];
         jwt.verify(token, accessTokenSecret, (err, user) => {
@@ -63,6 +62,7 @@ const authenticateJWT = (req, res, next) => {
             next();
         });
     } else {
+        console.log("Unauthorized action")
         res.sendStatus(401);
     }
 };
@@ -73,7 +73,7 @@ app.post('/login', (req, res) => {
     const { username, password } = req.body;
     connection.query('SELECT * FROM user', (err, rows) => {
         if (err) {
-            console.log('Error databse find users')
+            console.log('Error backend. Can\'t find users table.')
         }
         else {
             users = rows
@@ -129,12 +129,7 @@ app.post('/logout', (req, res) => {
 //End auth
 
 //Shop
-// app.get('/shop/pg/:pg/rs/:rs', (req, res) => {
 app.get('/shop', (req, res) => {
-    // var itemsPerPage = req.params.rs
-    // var offset = (req.params.pg - 1) * itemsPerPage;
-    // console.log('offset' + offset)
-    // console.log('limit' + itemsPerPage)
     connection.query(`SELECT
     t1.id as item_id,
     t1.date as date,
@@ -150,7 +145,6 @@ app.get('/shop', (req, res) => {
     LEFT JOIN categoryes as t3
      ON t1.category_id=t3.id
      `
-        //  LIMIT ${itemsPerPage} OFFSET ${offset}`
         , (err, rows) => {
             if (err) {
                 res.sendStatus(403)
@@ -221,7 +215,7 @@ app.post('/del-item/:id', authenticateJWT, (req, res, next) => {
             })
         })
         if (err) {
-            console.log("itemsphotos table dosen't exist")
+            console.log("Items photo table dosen't exist")
         }
     });
     if (req.role == adminRole.admin) {
@@ -630,7 +624,7 @@ app.get('/user/', authenticateJWT, function (req, res) {
     const id = req.idToken
     const idToken = req.idToken
     const role = req.role
-    connection.query('SELECT id,username, email, admin_role FROM user WHERE id =' + id, (err, rows, fields) => {
+    connection.query('SELECT id,username, email, admin_role, country, state, address, phone FROM user WHERE id =' + id, (err, rows, fields) => {
         res.status(200).json({
             status: 'Succes',
             data: rows,
@@ -638,13 +632,14 @@ app.get('/user/', authenticateJWT, function (req, res) {
     })
 });
 app.post('/signup', (req, res) => {
-    const { username, password, email } = req.body
+    const { username, password, email, state, country, address, phone } = req.body
     // Filter user from the users array by username and password; Create new user
-    if (username.length > 0 && password.length >= 6 && email.length > 0) {
-        /// Check if is allready user with this email
+    if (username.length > 0 && password.length >= 6 && email.length > 0 && state.length > 0 && country.length > 0 && email.length > 0 && email.length > 0) {
+        /// Check if it is allready user with this email
         connection.query('SELECT * FROM user', (err, rows) => {
             if (err) {
                 console.log('Error databse find users')
+                console.log(err);
             }
             else {
                 const user = rows.find(u => {
@@ -653,10 +648,10 @@ app.post('/signup', (req, res) => {
                 if (user) {
                     res.json({
                         status: 'Error',
-                        description: 'Allready exist on this email'
+                        description: 'An users allready exist on this email'
                     })
                 } else {
-                    connection.query(`INSERT INTO user(username, email, password) VALUES('${username}', '${email}', '${password}')`, (err, rows) => {
+                    connection.query(`INSERT INTO user(username, email, password, state, country, address, phone) VALUES('${username}', '${email}', '${password}', '${state}', '${country}', '${address}', '${phone}')`, (err, rows) => {
                         if (err) {
                             console.log(err)
                             return res.sendStatus(403)
@@ -683,6 +678,24 @@ app.post('/signup', (req, res) => {
     } else {
         res.sendStatus(411)
     }
+})
+app.post('/checkout/', authenticateJWT, (req, res) => {
+    const { customerId, items } = req.body
+    connection.query(`INSERT INTO orders (customerId) VALUES(${customerId})`, (err, row) => {
+        if (!err) {
+            let insertId = row.insertId
+            items.forEach(function (item) {
+                connection.query(`INSERT INTO orderItem (orderId,productId,quantity) VALUES(${(insertId)},${item.id},${item.count})`);
+            })
+            res.sendStatus(200)
+        } else {
+            res.json({
+                status: "Error",
+                description: err
+            })
+            console.log(err)
+        }
+    })
 })
 //End user
 app.listen(port, () => console.log("Node started to port: " + port))

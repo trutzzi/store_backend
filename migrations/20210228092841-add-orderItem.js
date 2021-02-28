@@ -15,7 +15,7 @@ exports.setup = function (options, seedLink) {
 };
 
 exports.up = function (db, callback) {
-  db.createTable('categoryphotos', {
+  return db.createTable('orderItem', {
     id: {
       type: 'int',
       primaryKey: true,
@@ -23,44 +23,37 @@ exports.up = function (db, callback) {
       notNull: true,
       autoIncrement: true,
     },
-    filename: {
-      type: 'string',
-    },
-    mimetype: {
-      type: 'string',
-    },
-    catId: {
-      unsigned: true,
-      notNull: true,
-      type: 'int',
-    },
-    path: {
-      type: 'string',
-    },
-    size: {
-      type: 'int'
-    },
-    originalName: {
-      type: 'string',
-    },
+    orderId: { type: 'int' },
+    productId: { type: 'int' },
+    quantity: { type: 'int' }
+
   }, function (err) {
     if (err) return callback(err);
     return callback();
   }).then(
     () => {
-      db.addForeignKey('categoryphotos', 'categoryes', 'photo_cat',
+      db.addForeignKey('orderItem', 'items', 'id',
         {
-          'catId': 'id'
+          'productId': 'id'
+        },
+        {
+          onDelete: 'CASCADE',
+          onUpdate: 'RESTRICT'
+        }, callback);
+      db.addForeignKey('orderItem', 'orders', 'id',
+        {
+          'orderId': 'id'
         },
         {
           onDelete: 'CASCADE',
           onUpdate: 'RESTRICT'
         }, callback);
     }
-  )
+  );
 };
+
 exports.down = function (db) {
-  return db.dropTable('categoryphotos');
+  return db.dropTable('orderItem');
 };
 
 exports._meta = {
